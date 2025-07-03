@@ -1,0 +1,114 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Address {
+  id: ID!
+  houseNumber: String!
+  street: String!
+  town: String!
+  city: String!
+  state: String!
+  country: String!
+}
+
+type Course {
+  id: Int!
+  name: String!
+  description: String!
+  createdAt: DateTime!
+  deletedAt: DateTime
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Enrollment {
+  id: ID!
+  user: User!
+  course: Course!
+  enrollmentDate: DateTime!
+  completionDate: DateTime
+  grade: String
+}
+
+type User {
+  id: ID!
+  email: String!
+  password: String
+  googleId: String
+  refreshToken: String
+  firstName: String
+  lastName: String
+  deletedAt: DateTime
+  createdAt: DateTime
+  addressId: String
+}
+
+type UserDto {
+  id: Float!
+  email: String!
+}
+
+type LoginResponse {
+  message: String!
+  user: UserDto!
+  accessToken: String!
+}
+
+type Query {
+  getAllUsers: [User!]!
+  getActiveUsers: [User!]!
+  getAddress: Address
+  getActiveCourses: [Course!]!
+  getAllCourses: [Course!]!
+  getEnrollments: [Enrollment!]!
+}
+
+type Mutation {
+  softDeleteUser(id: Int!): Boolean!
+  restoreUser(id: Int!): Boolean!
+  hardDeleteUser(id: Int!): Boolean!
+  saveAddress(address: AddressInput!): Boolean!
+  updateAddress(address: AddressInput!): Boolean!
+  login(email: String!, password: String!): LoginResponse!
+  createCourse(input: CreateCourseInput!): Course!
+  softDeleteCourse(id: Int!): Boolean!
+  restoreCourse(id: Int!): Boolean!
+  hardDeleteCourse(id: Int!): Boolean!
+  updateCourse(id: Int!, input: UpdateCourseInput!): Course
+  deleteEnrollment(id: Int!): Boolean!
+  createEnrollment(input: CreateEnrollmentInput!): Enrollment!
+  updateGrade(input: UpdateGradeInput!): Enrollment!
+}
+
+input AddressInput {
+  houseNumber: String!
+  street: String!
+  town: String!
+  city: String!
+  state: String!
+  country: String!
+}
+
+input CreateCourseInput {
+  name: String!
+  description: String!
+}
+
+input UpdateCourseInput {
+  name: String
+  description: String
+}
+
+input CreateEnrollmentInput {
+  userId: ID!
+  courseId: ID!
+}
+
+input UpdateGradeInput {
+  id: Int!
+  grade: String!
+}

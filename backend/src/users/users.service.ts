@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, Repository, EntityManager } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/entities/users.entity';
 import { Address } from 'src/entities/address.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { NotFoundException } from '@nestjs/common';
-import { AddressDto } from './dto/address.dto';
+import { AddressInput } from './dto/address.dto';
 import { Enrollment } from 'src/entities/enrollments.entity';
 
+// type for the transaction context
+type TransactionContext = {
+  userRepo: Repository<User>;
+  addressRepo: Repository<Address>;
+  enrollmentRepo: Repository<Enrollment>;
+};
 
 @Injectable()
 export class UsersService {
@@ -20,6 +26,15 @@ export class UsersService {
     @InjectRepository(Enrollment)
     private enrollmentRepository: Repository<Enrollment>,
   ) {}
+  // get the transaction context
+  private getTransactionContext(manager: EntityManager): TransactionContext {
+    return {
+      userRepo: manager.getRepository(this.usersRepo.target),
+      addressRepo: manager.getRepository(this.addressRepo.target),
+      enrollmentRepo: manager.getRepository(this.enrollmentRepository.target),
+    };
+  }
+  // ----------------Authentication-----------------------
 
   //  Register new user with hashed password
   async createLocalUser(createUserDto: CreateUserDto): Promise<User> {
@@ -58,7 +73,6 @@ export class UsersService {
   //  Find or create user via Google OAuth
   async findOrCreateOAuthUser(data: { googleId: string; email: string ,firstName:string,lastName:string }): Promise<User> {
     let user = await this.findByGoogleId(data.googleId);
-    console.log(user);
     if (!user) {
       // Check if user exists by email and link Google ID
       user = await this.findByEmail(data.email);
@@ -83,81 +97,110 @@ export class UsersService {
 
   // 🔄 Store hashed refresh token
   async updateRefreshToken(userId: number, token: string | null): Promise<void> {
-    await this.usersRepo.update(userId, { refreshToken: token ?? undefined });
+    await this.usersRepo.update({id:userId}, { refreshToken: token ?? undefined });
   }
+
+  // ----------------Address--------------------------
   // save address for user and link it to user
-  async saveAddress(address: AddressDto, userId: number): Promise<Address> {
-    const user = await this.usersRepo.findOne({ where: { id: userId } });
-  
+  async saveAddress(address: AddressInput, userId: number): Promise<boolean> {
+    return await this.usersRepo.manager.transaction(async (manager) => {
+      // Get repositories from the transactional entity manager
+      const { userRepo, addressRepo } = this.getTransactionContext(manager);
+      // find the user
+      const user = await userRepo.findOne({ where: { id: userId } });
+      // if user not found throw error
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
-  
-    const newAddress = this.addressRepo.create(address); 
-  
+    // create new address
+    const newAddress = addressRepo.create(address); 
+    // link address to user
     user.address = newAddress;
-  
+    // save user and address
     // cascade: true will handle saving both user and address, and setting addressId
-    const updatedUser = await this.usersRepo.save(user);
+    const updatedUser = await userRepo.save(user);
       if (!updatedUser.address) {
       throw new NotFoundException(`Address not found for user with ID ${userId}`);
       }
-    return updatedUser.address; // return the saved address (now with ID)
+      return true;
+  });
   }
 
   // update address for user
-  async updateAddress(address: AddressDto, userId: number): Promise<any> {
+  async updateAddress(address: AddressInput, userId: number): Promise<boolean> {
     const user = await this.usersRepo.findOne({ where: { id: userId }, relations: ['address'] });
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
     const updatedAddress = await this.addressRepo.update(user.address!.id, address);
-    return updatedAddress
+    
+    if(updatedAddress.affected && updatedAddress.affected > 0){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   // get address for user
-  async getAddress(userId: number): Promise<any> {
+  async getAddress(userId: number): Promise<Address | null> {
     const user = await this.usersRepo.findOne({ where: { id: userId }, relations: ['address'] });
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
-    console.log(user.address);
-    
-    return user.address;
+    return user.address || null; 
   }
+
+  // ----------------Users----------------------------
   // get all active users
   async getActiveUsers(): Promise<User[]> {
     return this.usersRepo.find({where:{deletedAt:IsNull()}}); // will return all users except soft deleted users
   }
+
   // get all users including soft deleted users
   async getAllUsers(): Promise<User[]> {
     return this.usersRepo.find({
       withDeleted: true,
     }); // will return all users including soft deleted users
   }
-  // soft delete user
-  async softDeleteUser(userId: number): Promise<void> {
-    await this.usersRepo.softDelete(userId);
-    // delete all enrollments of the user
-    await this.enrollmentRepository.delete({user:{id:userId}}); // soft delete the user will not delete the enrollments of the user 
 
+  // soft delete user
+  async softDeleteUser(userId: number): Promise<boolean> {
+    return await this.usersRepo.manager.transaction(async (manager) => {
+      // Get repositories from the transactional entity manager
+      const { userRepo, enrollmentRepo } = this.getTransactionContext(manager);
+
+      // Soft delete the user
+      const res = await userRepo.softDelete(userId);
+
+      // Check if the soft delete affected any rows
+      if (res.affected && res.affected > 0) {
+        // Delete all enrollments of the user
+        await enrollmentRepo.delete({ user: { id: userId } });
+        return true;
+      } else {
+        return false;
+      }
+    });
   }
+
   // restore user
-  async restoreUser(userId: number): Promise<void> {
-    await this.usersRepo.restore(userId);
+  async restoreUser(userId: number): Promise<boolean> {
+    const res = await this.usersRepo.restore(userId);
+
+    if(res.affected && res.affected > 0){
+      return true;
+    }else{
+      return false;
+    }
   }
-  
 
   // NOTE Cascade only works if the entity is fully loaded from the database
 
   // hard delete user
-  
-  async hardDeleteUser(userId: number): Promise<void> {
-    await this.usersRepo.manager.transaction("SERIALIZABLE", async (manager) => {
+  async hardDeleteUser(userId: number): Promise<boolean> {
+    return await this.usersRepo.manager.transaction(async (manager) => {
       // Get repositories from the transactional entity manager
-      const userRepo = manager.getRepository(this.usersRepo.target); // get the repository of type User which is the same as injected in the constructor
-      const enrollmentRepo = manager.getRepository(this.enrollmentRepository.target);
-      const addressRepo = manager.getRepository(this.addressRepo.target);
+      const { userRepo, enrollmentRepo, addressRepo } = this.getTransactionContext(manager);
   
       // Find the user, including soft-deleted ones
       const user = await userRepo.findOne({
@@ -170,8 +213,7 @@ export class UsersService {
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
   
-      // Delete all enrollments of the user
-      await enrollmentRepo.delete({ user: { id: userId } });
+      
   
       // Delete the address if present
       if (user.address) {
@@ -187,6 +229,7 @@ export class UsersService {
   
       // Hard delete the user
       await userRepo.remove(user);
+      return true;
     });
   }
   

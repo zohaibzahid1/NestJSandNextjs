@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Enrollment } from 'src/entities/enrollments.entity';
 import { Repository } from 'typeorm';
-import { UpdateGradeDto } from './dto/update-grade.dto';
-import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
+import { UpdateGradeInput } from './dto/update-grade.dto';
+import { CreateEnrollmentInput } from './dto/create-enrollment.dto';
 import { Course } from 'src/entities/course.entity';
 import { User } from 'src/entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,11 +25,21 @@ export class EnrollmentsService {
         return enrollments;
     }
     // delete enrollment
-    async deleteEnrollment(id: number): Promise<void> {
-        await this.enrollmentRepository.delete(id);
+    async deleteEnrollment(id: number): Promise<boolean> {
+        try{
+            console.log("inService:: ", id);
+            const result = await this.enrollmentRepository.delete(id);
+            if(result.affected === 0){
+                return false;
+            }
+                return true;
+        }catch(error){
+            console.log(error);
+            return false;
+        }
     }
     // create enrollment
-    async createEnrollment(createEnrollmentDto: CreateEnrollmentDto): Promise<Enrollment> {
+    async createEnrollment(createEnrollmentDto: CreateEnrollmentInput): Promise<Enrollment> {
         // extract userId and courseId from the createEnrollmentDto
         const {userId,courseId} = createEnrollmentDto;
         // check if user and course exist
@@ -49,21 +59,26 @@ export class EnrollmentsService {
         // create enrollment
         const enrollment = this.enrollmentRepository.create({user,course});
         // save enrollment
-        return this.enrollmentRepository.save(enrollment);
-        
+        const savedEnrollment = await this.enrollmentRepository.save(enrollment);
+        console.log("inService:: ", savedEnrollment);
+
+        return savedEnrollment;
+
     }
     // update grade of enrollment
-    async updateGrade(id: number, updateGradeDto: UpdateGradeDto): Promise<Enrollment> {
+    async updateGrade(updateGradeDto: UpdateGradeInput): Promise<Enrollment> {
         // extract enrollmentId and grade from the updateGradeDto
-        const {grade} = updateGradeDto;
+        const {id,grade} = updateGradeDto;
         // check if enrollment exists
-        const enrollment = await this.enrollmentRepository.findOne({where:{id:id}});
+        const enrollment = await this.enrollmentRepository.findOne({where:{id:id}, relations: ['user', 'course']});
         if(!enrollment){
             throw new NotFoundException('Enrollment not found');
         }
         // update grade
         enrollment.grade = grade;
         // save enrollment
-        return this.enrollmentRepository.save(enrollment);
+        const savedEnrollment = await this.enrollmentRepository.save(enrollment);
+        
+        return savedEnrollment;
     }
 }

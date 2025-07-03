@@ -6,10 +6,11 @@ import { Address } from 'src/entities/address.entity';
 import { UsersController } from './users.controller';
 import { Enrollment } from 'src/entities/enrollments.entity';
 import { Course } from 'src/entities/course.entity';
+import { UsersResolver } from './users.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Address,Enrollment,Course])],
-  providers: [UsersService],
+  providers: [UsersService,UsersResolver],
   exports: [UsersService],
   controllers: [UsersController],
 })

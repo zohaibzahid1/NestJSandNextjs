@@ -3,7 +3,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from 'src/entities/course.entity';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/entities/users.entity';
 import { Enrollment } from 'src/entities/enrollments.entity';
 
@@ -48,17 +48,50 @@ export class CoursesService {
   }
 
   // soft delete course
-  async softDeleteCourse(id: number): Promise<void> {
-    await this.courseRepository.softDelete(id);
+  async softDeleteCourse(id: number): Promise<boolean> {
+    try{
+    const result = await this.courseRepository.softDelete(id);
     // delete all enrollments of the course
-    await this.enrollmentRepository.delete({course:{id}}); // soft delete the course will not delete the enrollments of the course
+    await this.enrollmentRepository.delete({course:{id}});
+     // soft delete the course will delete the enrollments of the course
+     if(result.affected === 0) {
+        return false;
+        }
+        return true;
+
+    }
+    catch(error){
+        console.log(error);
+        return false;
+    }
   }
   // restore course
-  async restoreCourse(id: number): Promise<void> {
-    await this.courseRepository.restore(id);
+  async restoreCourse(id: number): Promise<boolean> {
+    try{
+    const result = await this.courseRepository.restore(id);
+    if(result.affected === 0) {
+        return false;
+        }
+    return true;
+    }
+    catch(error){
+        console.log(error);
+        return false;
+    }
   }
   // hard delete course
-  async hardDeleteCourse(id: number): Promise<void> {
-    await this.courseRepository.delete(id); // since we are using onDelete:CASCADE in the enrollments entity, this will also delete the enrollments of a course
+  async hardDeleteCourse(id: number): Promise<boolean> {
+    try{
+      // .delete() returns an object in the form of {affected:number,raw:[]}
+    const result = await this.courseRepository.delete(id); // since we are using onDelete:CASCADE in the enrollments entity, this will also delete the enrollments of a course
+    if(result.affected === 0) {
+        return false;
+        }
+    return true;
+    }
+    catch(error){
+        console.log(error);
+        return false;
+    }
   }
 }

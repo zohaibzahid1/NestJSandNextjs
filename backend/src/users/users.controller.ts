@@ -1,6 +1,6 @@
 import { Controller, Post, Get, Req, UseGuards, ForbiddenException, Res, Body, Patch, Put, Delete, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { AddressDto } from './dto/address.dto';
+import { AddressInput } from './dto/address.dto';
 import { JwtGuard } from 'src/guards/jwt-auth.guard';
 @Controller('users')
 export class UsersController {
@@ -8,12 +8,12 @@ export class UsersController {
 
     @Post('save-address')
     @UseGuards(JwtGuard)
-    async saveAddress(@Body() address: AddressDto, @Req() req) {
+    async saveAddress(@Body() address: AddressInput, @Req() req) {
         return this.usersService.saveAddress(address, req.user.userId);
     }
     @Patch('update-address')
     @UseGuards(JwtGuard)
-    async updateAddress(@Body() address: AddressDto, @Req() req) {
+        async updateAddress(@Body() address: AddressInput, @Req() req) {
         return this.usersService.updateAddress(address, req.user.userId);
     }
     @Get('get-address')
@@ -47,6 +47,5 @@ export class UsersController {
     @Delete('hard-delete-user/:id')
     async hardDeleteUser(@Param('id') id: number) {
         return this.usersService.hardDeleteUser(id);
-    }
-    
+    }   
 }

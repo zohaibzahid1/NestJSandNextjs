@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, Param, Post ,Body, Patch} from '@nestjs/common';
 import { EnrollmentsService } from './enrollments.service';
-import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
-import { UpdateGradeDto } from './dto/update-grade.dto';
+import { CreateEnrollmentInput } from './dto/create-enrollment.dto';
+import { UpdateGradeInput } from './dto/update-grade.dto';
 
 @Controller('enrollments')
 export class EnrollmentsController {
@@ -21,12 +21,12 @@ export class EnrollmentsController {
   }
   // create enrollment
   @Post('create-enrollment')
-  async createEnrollment(@Body() createEnrollmentDto: CreateEnrollmentDto) {
+  async createEnrollment(@Body() createEnrollmentDto: CreateEnrollmentInput) {
     return this.enrollmentsService.createEnrollment(createEnrollmentDto);
   }
-  // update grade of enrollment
-  @Patch('update-grade/:id')
-  async updateGrade(@Param('id') id: number, @Body() updateGradeDto: UpdateGradeDto) {
-    return this.enrollmentsService.updateGrade(id, updateGradeDto);
-  }
+    // update grade of enrollment
+    @Patch('update-grade/:id')
+    async updateGrade(@Param('id') id: number, @Body() updateGradeDto: UpdateGradeInput) {
+      return this.enrollmentsService.updateGrade( updateGradeDto);
+    }
 }

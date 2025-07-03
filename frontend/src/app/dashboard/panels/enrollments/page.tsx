@@ -9,13 +9,14 @@ const EnrollmentsPage = observer(() => {
 
   useEffect(() => {
     enrollmentsStore.loadAll();
-  }, [enrollmentsStore]);
+  }, []);
 
   const handleCreate = async () => {
     await enrollmentsStore.createEnrollment();
   };
 
   const handleDelete = async (id: number) => {
+    console.log("inPage:: ", id, ", typeof:", typeof id);
     await enrollmentsStore.deleteEnrollment(id);
   };
 

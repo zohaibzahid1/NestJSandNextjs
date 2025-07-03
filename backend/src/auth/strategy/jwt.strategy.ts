@@ -5,7 +5,7 @@ import { Request } from 'express';
 
 // Passport strategy for handling JWT authentication in NestJS.
 // This strategy extracts the JWT from cookie 
-
+// this verifies the jwt token make sure it is valid and not expired
 @Injectable()
 export class JwtStrategy extends PassportStrategy(JwtStrategyBase, 'jwt') {
   constructor() {

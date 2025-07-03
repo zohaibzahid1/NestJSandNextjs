@@ -1,13 +1,13 @@
 "use client";
-import { useState } from "react";
+import { observer } from "mobx-react-lite";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import axios from "axios";
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+import { loginStore } from "@/stores/loginstore";
+
+const LoginPage = observer(() => {
   const router = useRouter();
+  const { email, password, error, loading, setEmail, setPassword, login, googleLogin } = loginStore;
+
   useEffect(() => {
     const success = new URLSearchParams(window.location.search).get("success");
     if (success) {
@@ -17,25 +17,17 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     try {
-      await axios.post(
-        "http://localhost:3000/auth/login",
-        { email, password },
-        {
-          withCredentials: true, // Important for sending cookies
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      await login();
       router.push("/address");
-    } catch (err) {
-      setError("Invalid credentials");
-      console.log(err);
+    } catch {
+      // error is handled in store
       router.push("/");
     }
   };
+
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:3000/auth/google";
+    googleLogin();
   };
 
   return (
@@ -60,8 +52,12 @@ export default function LoginPage() {
             required
           />
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded transition font-semibold" type="submit">
-            Login
+          <button
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded transition font-semibold"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
         <button
@@ -77,4 +73,6 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+});
+
+export default LoginPage;

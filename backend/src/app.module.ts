@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -28,8 +31,16 @@ import { AboutsModule } from './aboutus/abouts.module';
     }),
     UsersModule,
     AuthModule,
+     // This line initializes the ConfigModule and loads environment variables from a .env file (if present).
+     // Setting isGlobal: true makes the configuration available throughout the entire application without needing to import ConfigModule in every module.
      ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver, // to use the apollo driver 
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // to generate the schema file
+      playground: true, // to enable the playground
+      context: ({ req, res }) => ({ req, res }), // to attach the request and response to the context
     }),
      CoursesModule,
      EnrollmentsModule,

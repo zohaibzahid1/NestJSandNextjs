@@ -1,4 +1,12 @@
-import { coursesApi } from "@/services/coursesApi";
+import {
+  getAllCourses,
+  getActiveCourses,
+  createCourse as gqlCreateCourse,
+  updateCourse as gqlUpdateCourse,
+  softDeleteCourse as gqlSoftDeleteCourse,
+  hardDeleteCourse as gqlHardDeleteCourse,
+  restoreCourse as gqlRestoreCourse
+} from "@/services/coursesApi";
 import { makeAutoObservable, action, computed, autorun, observable } from "mobx";
 
 interface Course {
@@ -110,7 +118,8 @@ export class CourseStore {
     loadCourses = async () => {
         try {
             this.loading = true;
-            const courses = await coursesApi.getAllCourses();
+            // You can switch to getActiveCourses if you want only active
+            const courses = await getAllCourses();
             this.courses = courses;
         } catch (error) {
             this.error = "Error loading courses";
@@ -126,7 +135,7 @@ export class CourseStore {
 
     softDeleteCourse = async (id: number) => {
         try {
-            await coursesApi.softDeleteCourse(id);
+            await gqlSoftDeleteCourse(id);
             this.courses.find(course => course.id === id)!.deletedAt = new Date().toISOString();
             this.successMsg = "Course deleted successfully";
         } catch (error) {
@@ -137,7 +146,7 @@ export class CourseStore {
 
     hardDeleteCourse = async (id: number) => {
         try {
-            await coursesApi.hardDeleteCourse(id);
+            await gqlHardDeleteCourse(id);
             this.courses = this.courses.filter(course => course.id !== id);
             this.successMsg = "Course deleted successfully";
         } catch (error) {
@@ -148,7 +157,7 @@ export class CourseStore {
 
     restoreCourse = async (id: number) => {
         try {
-            await coursesApi.restoreCourse(id);
+            await gqlRestoreCourse(id);
             this.courses.find(course => course.id === id)!.deletedAt = null;
             this.successMsg = "Course restored successfully";
         } catch (error) {
@@ -159,7 +168,7 @@ export class CourseStore {
 
     updateCourse = async (id: number, {name, description}: {name: string, description: string}) => {
         try {
-            await coursesApi.updateCourse(id, {name, description});
+            await gqlUpdateCourse(id, {name, description});
             this.successMsg = "Course updated successfully";
         } catch (error: unknown) {
             if (error instanceof Error && error.message === "Course not found") {
@@ -173,7 +182,7 @@ export class CourseStore {
 
     createCourse = async ({name, description}: {name: string, description: string}) => {
         try {
-            await coursesApi.createCourse({name, description});
+            await gqlCreateCourse({name, description});
             this.successMsg = "Course created successfully";
         } catch (error) {
             this.error = "Failed to create course";

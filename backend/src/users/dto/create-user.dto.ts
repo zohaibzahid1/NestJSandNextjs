@@ -1,6 +1,6 @@
 import { IsEmail, IsString, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { AddressDto } from './address.dto';
+import { AddressInput } from './address.dto';
 
 export class CreateUserDto {
     @IsEmail()
@@ -13,6 +13,6 @@ export class CreateUserDto {
 
     @IsOptional()
     @ValidateNested()
-    @Type(() => AddressDto)
-    address?: AddressDto;
+    @Type(() => AddressInput)
+    address?: AddressInput;
 } 

@@ -8,6 +8,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { RefreshStrategy } from './strategy/jwt-refresh.strategy';
 import { LocalStrategy } from './strategy/local.strategy';
 import { GoogleStrategy } from './strategy/google.strategy';
+import { AuthResolver } from './auth.resolver';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { GoogleStrategy } from './strategy/google.strategy';
     RefreshStrategy, // Strategy for handling refresh tokens
     LocalStrategy, // Strategy for local authentication (username/password)
     GoogleStrategy, // Strategy for Google OAuth authentication
+    AuthResolver,
   ],
 })
 export class AuthModule {}

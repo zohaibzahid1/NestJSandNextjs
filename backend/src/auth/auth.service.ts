@@ -54,6 +54,7 @@ export class AuthService {
    // Stores the hashed refresh token in the database.
   async storeRefreshToken(userId: number, refreshToken: string): Promise<void> {
     const hashed = await bcrypt.hash(refreshToken, 10);
+
     await this.usersService.updateRefreshToken(userId, hashed);
   }
 
@@ -85,10 +86,7 @@ export class AuthService {
 
     return {
       tokens,
-      user: {
-        id: user.id,
-        email: user.email,
-      },
+      user,
     };
   }
   // set auth cookies

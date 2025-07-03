@@ -1,4 +1,11 @@
-import { enrollmentsApi } from "@/services/enrollmentsApi";
+  import {
+  getAllEnrollments,
+  createEnrollment as gqlCreateEnrollment,
+  deleteEnrollment as gqlDeleteEnrollment,
+  updateGrade as gqlUpdateGrade,
+  getActiveUsers,
+  getActiveCourses
+} from "@/services/enrollmentsApi";
 import { makeAutoObservable, action, computed, autorun, observable, runInAction } from "mobx";
 
 export interface User {
@@ -70,9 +77,9 @@ export class EnrollmentsStore {
     this.loading = true;
     try {
       const [users, courses, enrollments] = await Promise.all([
-        enrollmentsApi.getActiveUsers(),
-        enrollmentsApi.getActiveCourses(),
-        enrollmentsApi.getAllEnrollments(),
+        getActiveUsers(),
+        getActiveCourses(),
+        getAllEnrollments(),
       ]);
       runInAction(() => {
         this.users = users;
@@ -92,12 +99,12 @@ export class EnrollmentsStore {
     if (!this.form.userId || !this.form.courseId) return;
     this.error = null;
     try {
-      await enrollmentsApi.createEnrollment({ userId: this.form.userId, courseId: this.form.courseId });
+      const enrollment = await gqlCreateEnrollment({ userId: this.form.userId, courseId: this.form.courseId });
+      this.enrollments.push(enrollment);
       runInAction(() => {
         this.successMsg = "Enrollment created successfully.";
         this.form = { userId: null, courseId: null };
       });
-      await this.loadAll();
     } catch (error: unknown) {
       runInAction(() => {
         if (error instanceof Error && error.message === "Enrollment already exists") {
@@ -110,12 +117,13 @@ export class EnrollmentsStore {
   };
 
   deleteEnrollment = async (id: number) => {
+    console.log("inStore:: ", id, ", typeof:", typeof id);
     try {
-      await enrollmentsApi.deleteEnrollment(id);
+      await gqlDeleteEnrollment(Number(id));
       runInAction(() => {
         this.successMsg = "Enrollment deleted successfully.";
       });
-      await this.loadAll();
+      this.enrollments = this.enrollments.filter(enrollment => enrollment.id !== id);
     } catch (error: unknown) {
       runInAction(() => {
         this.error = error instanceof Error ? error.message : "Failed to delete enrollment.";
@@ -134,12 +142,13 @@ export class EnrollmentsStore {
   updateGrade = async () => {
     if (!this.gradeEdit) return;
     try {
-      await enrollmentsApi.updateGrade(this.gradeEdit.id, this.gradeEdit.grade);
+      const updatedEnrollment = await gqlUpdateGrade({id: Number(this.gradeEdit.id), grade: this.gradeEdit.grade});
+      this.enrollments = this.enrollments.map(enrollment => enrollment.id === updatedEnrollment.id ? updatedEnrollment : enrollment);
       runInAction(() => {
         this.successMsg = "Grade updated successfully.";
         this.gradeEdit = null;
       });
-      await this.loadAll();
+      
     } catch (error: unknown) {
       runInAction(() => {
         this.error = error instanceof Error ? error.message : "Failed to update grade.";
