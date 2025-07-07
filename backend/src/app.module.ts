@@ -25,16 +25,14 @@ import { SeatsModule } from './seats/seats.module';
   controllers: [AppController],
   providers: [AppService],
   imports: [
-    TypeOrmModule.forRoot({ 
+    TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'admin123',
-      database: 'trial_db',
-      entities: [User,Address,Course,Enrollment,Seats,Screens,Cinemas],
-      synchronize: true, // auto-create tables in dev only
+      url: process.env.DATABASE_URL,
+      autoLoadEntities: true,
+      synchronize: true,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     }),
+    
     UsersModule,
     AuthModule,
      // This line initializes the ConfigModule and loads environment variables from a .env file (if present).
