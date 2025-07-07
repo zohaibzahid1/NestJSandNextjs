@@ -1,5 +1,6 @@
-import { usersApi } from "@/services/usersApi";
+import { usersApi, getMyBookingsApi } from "@/services/usersApi";
 import { action, autorun, computed, makeAutoObservable, observable, runInAction } from "mobx";
+import { screen } from "./bookingStore";
 
 // attributes that we need to display in the UI
 interface User {
@@ -7,6 +8,11 @@ interface User {
     name: string;
     email: string;
     deletedAt?: string | null;
+}
+export interface Booking {
+    id: number;
+    screen: screen;
+    seatNumber: number;
 }
 
 export class UserStore {
@@ -16,6 +22,9 @@ export class UserStore {
     error: string | null = null;
     success: string | null = null;
     showWithDeleted: boolean = true;    
+    myBookings = [];
+    loadingBookings = false;
+    bookingsError: string | null = null;
     
     constructor() {
         makeAutoObservable(this, {
@@ -136,4 +145,18 @@ export class UserStore {
     changeShowWithDeleted = () => {
         this.showWithDeleted = !this.showWithDeleted;
     }
+
+    // Fetch the current user's bookings
+    fetchMyBookings = async () => {
+        this.loadingBookings = true;
+        this.bookingsError = null;
+        try {
+            const data = await getMyBookingsApi();
+            this.myBookings = data.myBookings || [];
+        } catch (e) {
+            this.bookingsError = e instanceof Error ? e.message : String(e);
+        } finally {
+            this.loadingBookings = false;
+        }
+    };
 }

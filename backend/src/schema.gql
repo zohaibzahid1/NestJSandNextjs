@@ -34,6 +34,30 @@ type Enrollment {
   grade: String
 }
 
+type Cinemas {
+  id: Float!
+  name: String!
+  totalScreens: Float!
+  screens: [Screens!]!
+}
+
+type Screens {
+  id: Float!
+  name: String!
+  totalSeats: Float!
+  totalBooked: Float!
+  totalRemaining: Float!
+  seats: [Seats!]!
+  cinema: Cinemas!
+}
+
+type Seats {
+  id: Float!
+  seatNumber: Float!
+  screen: Screens!
+  user: User
+}
+
 type User {
   id: ID!
   email: String!
@@ -62,9 +86,14 @@ type Query {
   getAllUsers: [User!]!
   getActiveUsers: [User!]!
   getAddress: Address
+  myBookings: [Seats!]!
   getActiveCourses: [Course!]!
   getAllCourses: [Course!]!
   getEnrollments: [Enrollment!]!
+  getAllCinemas: [Cinemas!]!
+  getScreensByCinema(cinemaId: Int!): [Screens!]!
+  getScreen(id: Int!): Screens!
+  getSeats(screenId: Int!): [Seats!]
 }
 
 type Mutation {
@@ -82,6 +111,11 @@ type Mutation {
   deleteEnrollment(id: Int!): Boolean!
   createEnrollment(input: CreateEnrollmentInput!): Enrollment!
   updateGrade(input: UpdateGradeInput!): Enrollment!
+  createCinema(input: CreateCinemaInput!): Cinemas!
+  createScreen(input: CreateScreenInput!): Screens!
+  updateScreen(input: UpdateScreenInput!): Screens!
+  resetScreen(id: Int!): Screens!
+  bookSeat(input: BookSeatInput!): Seats!
 }
 
 input AddressInput {
@@ -111,4 +145,28 @@ input CreateEnrollmentInput {
 input UpdateGradeInput {
   id: Int!
   grade: String!
+}
+
+input CreateCinemaInput {
+  name: String!
+  totalScreens: Int!
+}
+
+input CreateScreenInput {
+  name: String!
+  totalSeats: Int!
+  cinemaId: Int!
+}
+
+input UpdateScreenInput {
+  id: Int!
+  name: String
+  totalSeats: Int
+  totalBooked: Int
+  totalRemaining: Int
+}
+
+input BookSeatInput {
+  seatNumber: Int!
+  screenId: Int!
 }

@@ -4,7 +4,7 @@ import React from 'react';
 
 const AnnouncementBar = () => {
   return (
-    <div className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-2 flex items-center justify-center overflow-hidden shadow animate-fade-in-down  -mt-8">
+    <div className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-2 flex items-center justify-center overflow-hidden shadow animate-fade-in-down ">
       <span className="mr-2 animate-bounce text-xl">🎉</span>
       <div className="relative w-full max-w-2xl">
         <span className="block whitespace-nowrap animate-marquee font-bold">

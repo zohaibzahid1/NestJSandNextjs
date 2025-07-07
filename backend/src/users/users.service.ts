@@ -8,6 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { NotFoundException } from '@nestjs/common';
 import { AddressInput } from './dto/address.dto';
 import { Enrollment } from 'src/entities/enrollments.entity';
+import { Seats } from '../entities/seat.entity';
 
 // type for the transaction context
 type TransactionContext = {
@@ -25,6 +26,8 @@ export class UsersService {
     private addressRepo: Repository<Address>,
     @InjectRepository(Enrollment)
     private enrollmentRepository: Repository<Enrollment>,
+    @InjectRepository(Seats)
+    private seatsRepository: Repository<Seats>,
   ) {}
   // get the transaction context
   private getTransactionContext(manager: EntityManager): TransactionContext {
@@ -232,7 +235,10 @@ export class UsersService {
       return true;
     });
   }
-  
+
+  async getUserBookings(userId: number): Promise<Seats[]> {
+    return this.seatsRepository.find({ where: { user: { id: userId } }, relations: ['screen'] });
   }
+}
   
 

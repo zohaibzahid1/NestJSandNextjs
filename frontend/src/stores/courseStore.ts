@@ -1,6 +1,5 @@
 import {
   getAllCourses,
-  getActiveCourses,
   createCourse as gqlCreateCourse,
   updateCourse as gqlUpdateCourse,
   softDeleteCourse as gqlSoftDeleteCourse,

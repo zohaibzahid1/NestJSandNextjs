@@ -1,5 +1,13 @@
 import { fetchGraphQL } from "@/services/baseGraphqlApi";
 
+interface Address {
+  houseNumber: string;
+  street: string;
+  town: string;
+  city: string;
+  state: string;
+  country: string;
+}
 export async function getAddress() {
   const query = `
     query GetAddress {
@@ -17,7 +25,7 @@ export async function getAddress() {
   return data.getAddress;
 }
 
-export async function saveAddress(address: any) {
+export async function saveAddress(address: Address) {
   const mutation = `
     mutation SaveAddress($address: AddressInput!) {
       saveAddress(address: $address) 
@@ -27,7 +35,7 @@ export async function saveAddress(address: any) {
   return data.saveAddress;
 }
 
-export async function updateAddress(address: any) {
+export async function updateAddress(address: Address) {
   const mutation = `
     mutation UpdateAddress($address: AddressInput!) {
       updateAddress(address: $address)

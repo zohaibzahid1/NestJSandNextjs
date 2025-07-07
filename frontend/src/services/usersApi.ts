@@ -45,3 +45,22 @@ export const usersApi = {
         return data.restoreUser;
     },
 }
+
+// Fetch all bookings for the current user
+export async function getMyBookingsApi() {
+    const query = `
+        query MyBookings {
+            myBookings {
+                id
+                seatNumber
+                screen {
+                    id
+                    name
+                    
+                }
+                user { id email }
+            }
+        }
+    `;
+    return fetchGraphQL(query);
+}

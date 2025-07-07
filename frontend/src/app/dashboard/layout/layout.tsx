@@ -1,4 +1,4 @@
-// export const dynamic = 'force-static'; // SSG layout
+export const dynamic = 'force-static'; // SSG layout
 
 import React from 'react';
 import Sidebar from './sidebar';

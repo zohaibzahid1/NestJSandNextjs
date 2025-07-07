@@ -2,9 +2,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAddress, saveAddress, updateAddress } from "@/services/AddressApi";
-
+interface Address {
+  houseNumber: string;
+  street: string;
+  town: string;
+  city: string;
+  state: string;
+  country: string;
+}
 export default function AddressPage() {
-  const [address, setAddress] = useState<any>(null);
+  const [address, setAddress] = useState<Address | null>(null);
   const [form, setForm] = useState({
     houseNumber: "",
     street: "",

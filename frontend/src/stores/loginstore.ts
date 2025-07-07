@@ -1,12 +1,18 @@
 import { makeAutoObservable, runInAction, action } from "mobx";
 import { loginApi } from "@/services/loginApi";
 
+interface User {
+  id: number;
+  email: string;
+  name: string;
+}
+
 export class LoginStore {
   email: string = "";
   password: string = "";
   loading: boolean = false;
   error: string | null = null;
-  user: any = null;
+  user: User | null = null;
 
   constructor() {
     makeAutoObservable(this, {
@@ -31,7 +37,7 @@ export class LoginStore {
     this.error = error;
   };
 
-  setUser = (user: any) => {
+  setUser = (user: User) => {
     this.user = user;
   };
 
@@ -45,12 +51,12 @@ export class LoginStore {
         this.loading = false;
       });
       return user;
-    } catch (err: any) {
+    } catch (error: unknown) {
       runInAction(() => {
-        this.error = err.message || "Invalid credentials";
+        this.error = (error as Error).message || "Invalid credentials";
         this.loading = false;
       });
-      throw err;
+      throw error;
     }
   };
 

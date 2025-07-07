@@ -1,5 +1,6 @@
 export const revalidate = false; // Server Side Generation // no need to revalidate the page
 export const dynamic = 'force-static'; // SSG layout
+
 import React from 'react';
 import Link from 'next/link';
 

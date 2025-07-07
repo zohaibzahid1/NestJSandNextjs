@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne,JoinColumn,DeleteDateC
 import { Address } from './address.entity';
 import { Enrollment } from './enrollments.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Seats } from './seat.entity';
 
 @ObjectType()
 @Entity()
@@ -41,6 +42,7 @@ export class User {
   @Field(() => Date, { nullable: true })
   @CreateDateColumn()
   createdAt: Date;
+  
   // --------------------------------------------------------------
   // for Database Relations
 
@@ -50,6 +52,9 @@ export class User {
   
   @OneToMany(() => Enrollment, (enrollment) => enrollment.user)
   enrollments: Enrollment[];
+
+  @OneToMany(() => Seats, (seat) => seat.user, {nullable:true})
+  seats: Seats[];
 
   // GraphQl Schema specific fields
 

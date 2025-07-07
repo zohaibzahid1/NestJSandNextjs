@@ -15,6 +15,12 @@ import { Course } from './entities/course.entity';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { Enrollment } from './entities/enrollments.entity';
 import { AboutsModule } from './aboutus/abouts.module';
+import { Seats } from './entities/seat.entity';
+import { Screens } from './entities/screens.entity';
+import { Cinemas } from './entities/cinemas.entity';
+import { CinemasModule } from './cinemas/cinemas.module';
+import { ScreensModule } from './screens/screens.module';
+import { SeatsModule } from './seats/seats.module';
 @Module({
   controllers: [AppController],
   providers: [AppService],
@@ -26,7 +32,7 @@ import { AboutsModule } from './aboutus/abouts.module';
       username: 'postgres',
       password: 'admin123',
       database: 'trial_db',
-      entities: [User,Address,Course,Enrollment],
+      entities: [User,Address,Course,Enrollment,Seats,Screens,Cinemas],
       synchronize: true, // auto-create tables in dev only
     }),
     UsersModule,
@@ -45,6 +51,9 @@ import { AboutsModule } from './aboutus/abouts.module';
      CoursesModule,
      EnrollmentsModule,
      AboutsModule,
+     CinemasModule,
+     ScreensModule,
+     SeatsModule,
   ],
 })
 export class AppModule {}

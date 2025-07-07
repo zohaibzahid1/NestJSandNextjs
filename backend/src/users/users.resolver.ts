@@ -5,6 +5,7 @@ import { AddressInput } from "./dto/address.dto";
 import { JwtGuard } from "src/guards/jwt-auth.guard";
 import { UseGuards } from "@nestjs/common";
 import { Address } from "src/entities/address.entity";
+import { Seats } from "src/entities/seat.entity";
 
 // This decorator marks the class as a GraphQL resolver for the User entity.
 // It tells NestJS GraphQL to treat this class as responsible for handling GraphQL queries and mutations related to the User type.
@@ -65,6 +66,14 @@ export class UsersResolver {
     async getAddress(@Context() context: any) {
         const userId = context.req.user.userId;
         return this.usersService.getAddress(userId);
+    }
+
+    // get all seat bookings for the authenticated user
+    @Query(() => [Seats])
+    @UseGuards(JwtGuard)
+    async myBookings(@Context() context: any) {
+        const userId = context.req.user.userId;
+        return this.usersService.getUserBookings(userId);
     }
 
 }

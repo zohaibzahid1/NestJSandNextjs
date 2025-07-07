@@ -1,6 +1,6 @@
 const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || "http://localhost:3000/graphql";
 
-export async function fetchGraphQL(query: string, variables?: Record<string, any>) {
+export async function fetchGraphQL(query: string, variables?: Record<string, unknown>) {
   
   // if(variables){
   //   if(variables.id){
@@ -12,6 +12,7 @@ export async function fetchGraphQL(query: string, variables?: Record<string, any
   // }
  // console.log("Final Payload:", JSON.stringify({ query, variables }, null, 2));
 
+ 
   const res = await fetch(GRAPHQL_ENDPOINT, {
     method: "POST",
     headers: {
