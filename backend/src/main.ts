@@ -1,9 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
-import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path';
+import cookieParser from 'cookie-parser';
+
 
 async function bootstrap() {
    // to create the app including all modules
