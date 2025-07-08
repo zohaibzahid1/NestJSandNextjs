@@ -27,6 +27,6 @@ export const loginApi = {
 
   // Google login (redirect)
   googleLogin: () => {
-    window.location.href = "http://localhost:3000/auth/google";
+    window.location.href = `${process.env.NEXT_PUBLIC_DEPLOYED_URL}/auth/google`;
   },
 }; 
