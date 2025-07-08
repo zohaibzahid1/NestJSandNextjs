@@ -98,7 +98,7 @@ export class AuthService {
       sameSite: 'none',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      domain: 'nest-j-sand-nextjs.vercel.app',
+      
     });
     // Set access token (optional in cookie)
     res.cookie('access_token', tokens.accessToken, {
@@ -107,7 +107,7 @@ export class AuthService {
       sameSite: 'none',
       path: '/',
       maxAge: 15 * 60 * 1000, // 15 minutes
-      domain: 'nest-j-sand-nextjs.vercel.app',
+      
     });
   }
 
