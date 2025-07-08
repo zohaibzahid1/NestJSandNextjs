@@ -6,7 +6,7 @@ const AboutUsPage = async () => {
   let mission = "Unable to load mission statement.";
 
   try {
-    const res = await fetch("http://localhost:3000/aboutus", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_DEPLOYED_URL}/aboutus`, {
       cache: 'force-cache',
     });
     const data = await res.json();
