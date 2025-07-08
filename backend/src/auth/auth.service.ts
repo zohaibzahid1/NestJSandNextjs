@@ -94,18 +94,20 @@ export class AuthService {
     // Set refresh token as a secure, HTTP-only cookie
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Enable only on HTTPS in prod
+      secure: true,
       sameSite: 'none',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      domain: 'nest-j-sand-nextjs.vercel.app',
     });
     // Set access token (optional in cookie)
     res.cookie('access_token', tokens.accessToken, {
-      httpOnly: false, // Accessible via JavaScript if needed
-      secure: process.env.NODE_ENV === 'production',
+      httpOnly: false,
+      secure: true,
       sameSite: 'none',
       path: '/',
       maxAge: 15 * 60 * 1000, // 15 minutes
+      domain: 'nest-j-sand-nextjs.vercel.app',
     });
   }
 
@@ -123,7 +125,7 @@ export class AuthService {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'none',
-      
+
 
     });
     return { accessToken };
