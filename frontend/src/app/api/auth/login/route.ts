@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export async function POST(req: NextRequest) {
   // Parse the request body (GraphQL query and variables)
@@ -36,10 +36,16 @@ export async function POST(req: NextRequest) {
     }
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
-      { error: error.response?.data || 'Login failed' },
-      { status: error.response?.status || 500 }
+      { error: 'Login failed' },
+      { status: 500 }
     );
   }
 } 
