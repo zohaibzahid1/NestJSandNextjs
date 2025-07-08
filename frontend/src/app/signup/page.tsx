@@ -9,10 +9,11 @@ export default function SignupPage() {
   const router = useRouter()
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    const url = process.env.NEXT_PUBLIC_DEPLOYED_URL + "/auth/register";
     setError("");
-    
-    const res = await fetch(`${process.env.DEPLOYED_URL}/auth/register`, {
+   
+    console.log(url);
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
