@@ -29,4 +29,5 @@ export const loginApi = {
   googleLogin: () => {
     window.location.href = `${process.env.NEXT_PUBLIC_DEPLOYED_URL}/auth/google`;
   },
+  
 }; 
