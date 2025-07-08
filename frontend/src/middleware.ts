@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
 
     try {
         // call a backend api to verify the token using axios
-        await axios.post('http://localhost:3000/auth/verify-token', { token });     
+        await axios.post(`${process.env.NEXT_PUBLIC_DEPLOYED_URL}/auth/verify-token`, { token });     
     } catch (err) {
         console.log("err:: ",err);
       return NextResponse.redirect(new URL('/login', req.url));
