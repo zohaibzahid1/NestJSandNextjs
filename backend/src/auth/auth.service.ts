@@ -94,8 +94,8 @@ export class AuthService {
     // Set refresh token as a secure, HTTP-only cookie
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       
@@ -103,10 +103,11 @@ export class AuthService {
     // Set access token (optional in cookie)
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: false,
-      secure: false,
-      sameSite: 'lax',
+      secure: true ,
+      sameSite: 'none',
       path: '/',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: 15 * 60 * 1000, // 15 minutes,
+
       
     });
   }
