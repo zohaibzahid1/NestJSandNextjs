@@ -7,11 +7,13 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     setError("");
-    const res = await fetch("http://localhost:3000/auth/register", {
+    
+    const res = await fetch(`${baseUrl}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -25,7 +27,7 @@ export default function SignupPage() {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "http://localhost:3000/auth/google";
+    window.location.href = `${baseUrl}/auth/google`;
   };
 
   return (
