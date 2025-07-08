@@ -5,7 +5,7 @@ import axios from 'axios';
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get('access_token')?.value;
-  
+  console.log("token:: ",token);
   // Protect these routes
   const protectedRoutes = ['/address']; // add more routes here
 
@@ -13,9 +13,10 @@ export async function middleware(req: NextRequest) {
   const isProtected = protectedRoutes.some(route =>
     req.nextUrl.pathname.startsWith(route)
   );
-
+  console.log("isProtected:: ",isProtected);
   if (isProtected) {
     if (!token) {
+      
       return NextResponse.redirect(new URL('/login', req.url));
     }
 
