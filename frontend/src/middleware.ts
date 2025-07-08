@@ -16,7 +16,6 @@ export async function middleware(req: NextRequest) {
   console.log("isProtected:: ",isProtected);
   if (isProtected) {
     if (!token) {
-      
       return NextResponse.redirect(new URL('/login', req.url));
     }
 
