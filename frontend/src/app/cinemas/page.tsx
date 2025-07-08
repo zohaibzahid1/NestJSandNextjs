@@ -23,6 +23,7 @@ const CinemaPage = observer(() => {
       screensStore.setSuccess();
     }
   };
+  
 
   return (
     <div className="max-w-2xl mx-auto mt-16 p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow-lg border border-blue-100">
