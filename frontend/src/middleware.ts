@@ -7,8 +7,8 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get('access_token')?.value;
   console.log("token:: ",token);
   // Protect these routes
-  const protectedRoutes = ['/address']; // add more routes here
-
+  const protectedRoutes = ['/dfs']; // add more routes here
+  // i have added temprorary route here address is not being verified 
   
   const isProtected = protectedRoutes.some(route =>
     req.nextUrl.pathname.startsWith(route)
