@@ -123,6 +123,7 @@ export class AuthService {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'none',
+      
 
     });
     return { accessToken };

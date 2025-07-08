@@ -40,6 +40,7 @@ const ProfilePage = observer(() => {
       </div>
     </div>
   );
+  
 });
 
 export default ProfilePage; 
